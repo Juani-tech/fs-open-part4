@@ -32,11 +32,3 @@ Note.find({}).then((result) => {
   });
   mongoose.connection.close();
 });
-
-// Note.find({ important: true }).then((result) => {
-// });
-
-// note.save().then((result) => {
-//   console.log("note saved");
-//   mongoose.connection.close();
-// });
