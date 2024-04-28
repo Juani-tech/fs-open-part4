@@ -1,5 +1,6 @@
 const Note = require("../models/note");
 const User = require("../models/user");
+const bcrypt = require("bcrypt");
 const initialNotes = [
   {
     content: "HTML is easy",
@@ -11,6 +12,13 @@ const initialNotes = [
   },
 ];
 
+const createTestUser = async () => {
+  await User.deleteMany({});
+  const passwordHash = await bcrypt.hash("password", 10);
+  const user = new User({ username: "testuser", passwordHash });
+  await user.save();
+  return user;
+};
 // Funcion que crea un nuevo objeto Note, lo guarda en la base de datos y luego lo elimina para obtener un nuevo id
 const nonExistingId = async () => {
   const note = new Note({ content: "willremovethissoon" });
@@ -32,6 +40,7 @@ const usersInDb = async () => {
 
 module.exports = {
   initialNotes,
+  createTestUser,
   nonExistingId,
   notesInDb,
   usersInDb,

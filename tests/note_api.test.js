@@ -66,16 +66,24 @@ describe("viewing a specific note", () => {
 
 describe("addition of a new note", () => {
   test("succeeds with valid data", async () => {
-    const user = await helper.usersInDb();
-    console.log(user[0].id);
+    const user = await helper.createTestUser();
+
+    const loginResponse = await api.post("/api/login").send({
+      username: "testuser",
+      password: "password",
+    });
+
+    const token = loginResponse.body.token;
+
     const newNote = {
       content: "async/await simplifies making async calls",
       important: true,
-      userId: user[0].id,
+      userId: user.id,
     };
 
     await api
       .post("/api/notes")
+      .set("Authorization", `Bearer ${token}`)
       .send(newNote)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -88,14 +96,26 @@ describe("addition of a new note", () => {
   });
 
   test("fails with status code 400 if data invalid", async () => {
-    const users = await helper.usersInDb();
+    // const users = await helper.usersInDb();
+    const user = await helper.createTestUser();
+
+    const loginResponse = await api.post("/api/login").send({
+      username: "testuser",
+      password: "password",
+    });
+
+    const token = loginResponse.body.token;
 
     const newNote = {
       important: true,
-      userId: users[0].id,
+      userId: user.id,
     };
 
-    await api.post("/api/notes").send(newNote).expect(400);
+    await api
+      .post("/api/notes")
+      .set("Authorization", `Bearer ${token}`)
+      .send(newNote)
+      .expect(400);
 
     const notesAtEnd = await helper.notesInDb();
 
